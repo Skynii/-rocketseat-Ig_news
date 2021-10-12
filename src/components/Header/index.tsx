@@ -1,24 +1,26 @@
-import { AppProps } from 'next/app';
-import React from 'react';
-import { SignInButton } from '../SignInButton';
+import logoImg from '../../assets/logo.svg';
 
-import styles from './styles.module.scss';
+import { Container, Content } from './styles';
 
-export function Header(){
+
+interface HeaderProps{
+    onOpenNewTransactionModal:()=> void;
+        
+    };
+
+export function Header({onOpenNewTransactionModal}:HeaderProps){
+ 
+
     return(
-        <header className={styles.headerContainer}>
-            <div className={styles.headerContent}>
-                <img src="images/logo.svg" alt="ig.news"/>
-                <nav>
-                    <a className={styles.active}>Home</a>
-                    <a>Post</a>
-                </nav>
+        <Container>
+            <Content>
+                <img src= {logoImg} alt ="dt Money" />
+                <button type="button" onClick={onOpenNewTransactionModal}>
+                Nova transação
+                </button>
 
-                <SignInButton />
-            </div>
-       
-
-
-        </header>
-    );
+                
+            </Content>
+        </Container>
+    )
 }
