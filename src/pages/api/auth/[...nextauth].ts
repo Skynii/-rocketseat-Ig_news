@@ -1,6 +1,7 @@
 import { query as q} from 'faunadb'
 
 import NextAuth from "next-auth"
+import { session } from 'next-auth/client';
 import Providers from "next-auth/providers"
 
 import  { fauna } from '../../../services/fauna';
@@ -12,11 +13,52 @@ export default NextAuth({
       clientId: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
       scope: 'read:user'
-    }),
-    
+    }),    
   ],
+
     
   callbacks: {
+
+   //Verifica se usuario tem conta ativa
+   async session(session) {
+    try{
+      const userActiveSubscription = await fauna.query(
+      q.Get(
+        q.Intersection( [
+          q.Match(
+            q.Index('subscription_by_user_ref'),
+             q.Select(
+               "ref",
+               q.Get(
+                 q.Match(
+                   q.Index('user_by_email'),
+                   q.Casefold(session.user.email)
+                 )
+               )
+             ) 
+          ),
+          q.Match(q.Index('subscription_by_status'), 
+          "active"
+          )
+        ])
+       )
+      )
+    
+
+  return {
+  ...session,
+  activeSubscription: userActiveSubscription
+      }
+    } catch (err) {
+      return {
+        ...session,
+        activeSubscription: null,
+      }
+    }
+  },  
+      
+  
+
     async signIn( user, account, profile) {
         const { email } = user
 
@@ -32,12 +74,12 @@ export default NextAuth({
                    )
                  ),
                  q.Create(
-                   q.Collection('users'),
+                   q.Collection('user'),
                    { data: { email } }
                  ),
                  q.Get(
                    q.Match(
-                     q.Index('users_by_email'),
+                     q.Index('user_by_email'),
                      q.Casefold(user.email)
                    )
                  )
@@ -45,8 +87,9 @@ export default NextAuth({
             )
 
         return true
-    } catch {
-        return false
+    } catch (err) {
+       console.log(err)
+        return false;
       }
     },
     }
