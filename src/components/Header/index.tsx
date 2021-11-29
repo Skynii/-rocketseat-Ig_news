@@ -1,26 +1,33 @@
-import logoImg from '../../assets/logo.svg';
+import { AppProps } from 'next/app';
+import React from 'react';
+import { SignInButton } from '../SignInButton';
+import Link from 'next/link';
+import styles from './styles.module.scss';
+import { ActiveLink } from '../ActiveLink';
+import { useRouter } from 'next/router';
 
-import { Container, Content } from './styles';
-
-
-interface HeaderProps{
-    onOpenNewTransactionModal:()=> void;
-        
-    };
-
-export function Header({onOpenNewTransactionModal}:HeaderProps){
+export function Header(){
  
 
-    return(
-        <Container>
-            <Content>
-                <img src= {logoImg} alt ="dt Money" />
-                <button type="button" onClick={onOpenNewTransactionModal}>
-                Nova transação
-                </button>
 
-                
-            </Content>
-        </Container>
-    )
+    return(
+        <header className={styles.headerContainer}>
+            <div className={styles.headerContent}>
+                <img src="images/logo.svg" alt="ig.news"/>
+                <nav>
+                    <ActiveLink activeClassName={styles.active} href= "/" >
+                        <a >Home</a>
+                    </ActiveLink>
+                    <ActiveLink activeClassName={styles.active} href= "/posts" >
+                        <a>Post</a>
+                    </ActiveLink>
+                </nav>
+
+                <SignInButton />
+            </div>
+       
+
+
+        </header>
+    );
 }
